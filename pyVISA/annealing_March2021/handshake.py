@@ -1,6 +1,6 @@
 import time
 import vxi11
-instr = vxi11.Instrument("10.168.233.224")
+instr = vxi11.Instrument("10.168.233.227")
 
 f = open('handshake.lua')
 commands = f.readlines()

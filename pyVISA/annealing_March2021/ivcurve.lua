@@ -15,14 +15,14 @@ function IVRunnerList(ilimit, nwaitseconds)
    -- smu.measure.nplc = 3 -- default is 1
 
    defbuffer1.clear()
-   ivBuffer = buffer.make(2500)
+   ivBuffer = buffer.make(5000)
    ivBuffer.clear()
    ivBuffer.clearcache()
    ivBuffer.appendmode = 1
    smu.source.ilimit.level = ilimit -- recommendation from thomas 3-5 mA tops
    smu.source.output = smu.ON
 
-   for element = 0, 526, 1
+   for element = 0, 600, 1
    do
       val = 0
       if( element>=0 )
@@ -46,9 +46,9 @@ function IVRunnerList(ilimit, nwaitseconds)
 	val = 38.0 + 0.0125*(element-127)
       end
       smu.source.level = val
-      --smu.source.level = mylist[element]
+
       --local starttime = os.time()
-      --local endtime = starttime + nwaitseconds
+      --local endtime = starttime + 0.1
 
       --i = smu.measure.read()
       --closemaxrange = math.abs(i) > 0.60*smu.measure.range

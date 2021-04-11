@@ -3,7 +3,8 @@ import time
 import datetime
 #import vxi11
 #instr = vxi11.Instrument("10.168.233.226")
-tl = telnetlib.Telnet('10.168.233.226', 5025)
+#tl = telnetlib.Telnet('10.168.233.226', 5025)
+tl = telnetlib.Telnet('10.168.233.245', 5025)
 
 #print( instr.ask('*IDN?') )
 
@@ -22,11 +23,11 @@ tl = telnetlib.Telnet('10.168.233.226', 5025)
 #print( '      AMPLITUDE =', instr.ask('SOURce1:VOLTage:LIMit:LOW?') ) 
 
 output = [] 
-i = 50
+i = 90
 while i > 0:
     tstmp = datetime.datetime.now()
     tl.write(':MEAS:RES?\r\n')
-    #time.sleep(0.1)
+    time.sleep(0.1)
     msg = tl.read_some().strip()
     output.append((time.time(), msg))
     print(msg)

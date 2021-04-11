@@ -31,11 +31,14 @@ instr.write("endscript")
 #instr.write(cmd)
 instr.write("testInfo.run()")
 
-instr.write("IVRunnerList(0.005,0.01)") #limit current to 3mA
-print("waiting for ", 30, " seconds")
-time.sleep(30)
+instr.write("IVRunnerList(0.005,1)") #limit current to 3mA
+print("waiting for ", 90, " seconds")
+time.sleep(90)
 print("DONE waiting")
 
+#instr.read() #read buff
+#instr.read() #read buff
+    
 instr.write('print(ivBuffer.n)')
 whatn = instr.read()
 print(whatn)
@@ -44,7 +47,7 @@ output = []
 for i in range(n):
     instr.write('printbuffer({0}, {1}, ivBuffer.timestamps, ivBuffer.sourcevalues,  ivBuffer.sourceunits, ivBuffer.readings,  ivBuffer.units)'.format(i+1,i+1))
     output.append( instr.read() )
-    print( output[i] )
+    #print( i, output[i] )
 
 f = open('outputdata.csv', 'w+')
 for i in range(n):
