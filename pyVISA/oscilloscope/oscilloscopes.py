@@ -85,8 +85,9 @@ class lecroy:
         self.instr.write("*RST")
         print("START")
         print( self.instr.ask('*IDN?') )
-        #self.instr.write("COMM_HEADER OFF")
+        self.instr.write("GRID SINGLE")
         #self.instr.write("DISPLAY OFF")
+
 
     def setTriggerLevel( self, chn="C1", slope="POS", lev=0.1, debug=False ): ### units V
         self.instr.write( "{}:TRIG_LEVEL {}".format(chn,lev) )
@@ -118,6 +119,7 @@ class lecroy:
         self.instr.write( "{}:COUPLING D50".format(chn) )
         self.instr.write( "{}:VOLT_DIV {}".format(chn,vscale) )
         self.instr.write( "{}:OFFSET {}".format(chn,voff) )
+        self.instr.write( "{}:TRACE ON".format(chn) )
         if(debug):
             print( "{} scale:".format(chn), self.instr.ask( "{}:VOLT_DIV?".format(chn) ) )
             print( "{} offset:".format(chn), self.instr.ask( "{}:OFFSET?".format(chn) ) )
@@ -130,7 +132,7 @@ class lecroy:
             print( "Timebase offset:", self.instr.ask( "TRIG_DELAY?" ) )
 
     def acquire( self, cnt=1000, pnt=300, fileSuffix="tmp", debug=True ):
-        self.instr.write( "STORE_SETUP C1,C2,C3,C4,C5,C6,C7,C8,HDD,AUTO,OFF,FORMAT,BINARY" )
+        self.instr.write( "STORE_SETUP ALL_DISPLAYED,HDD,AUTO,OFF,FORMAT,BINARY" )
         self.instr.write( "SEQ ON,{}".format(cnt) )
         self.instr.write( "*TRG" )
         self.instr.write( "WAIT" )
