@@ -108,6 +108,12 @@ class lecroy:
         if(debug):
             print( "Trigger mode:", self.instr.ask("TRIG_MODE?") )
     
+    def setTriggerMultiStage( self,  debug=False ): ### units V
+        self.instr.write( "TRIG_SELECT TEQ,SR,C1,QL,C2,HT,TL,HV,10e-9S" )
+        self.instr.write( "TRIG_MODE NORM" )
+        if(debug):
+            print( "Trigger mode:", self.instr.ask("TRIG_MODE?") )
+    
     def setChannel( self, chn="C1", vscale=50e-3, voff=0.0, debug=False ): ### units V
         self.instr.write( "{}:COUPLING D50".format(chn) )
         self.instr.write( "{}:VOLT_DIV {}".format(chn,vscale) )
