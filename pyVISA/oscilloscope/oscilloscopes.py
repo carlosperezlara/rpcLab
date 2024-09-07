@@ -83,11 +83,9 @@ class lecroy:
         self.instr.write("STOP")
         self.instr.write("*CLS")
         self.instr.write("*RST")
-        print("START")
         print( self.instr.ask('*IDN?') )
         self.instr.write("GRID SINGLE")
-        #self.instr.write("DISPLAY OFF")
-
+        self.instr.write("DISPLAY ON")
 
     def setTriggerLevel( self, chn="C1", slope="POS", lev=0.1, debug=False ): ### units V
         self.instr.write( "{}:TRIG_LEVEL {}".format(chn,lev) )
@@ -131,7 +129,9 @@ class lecroy:
             print( "Timebase scale:", self.instr.ask( "TIME_DIV?" ) )
             print( "Timebase offset:", self.instr.ask( "TRIG_DELAY?" ) )
 
-    def acquire( self, cnt=1000, pnt=300, fileSuffix="tmp", debug=True ):
+    def acquire( self, cnt=1000, fileSuffix="tmp" ):
+        print("START ACQUISITION FOR RUN {} => {} events".format(fileSuffix,cnt))
+        self.instr.write("DISPLAY OFF")
         self.instr.write( "STORE_SETUP ALL_DISPLAYED,HDD,AUTO,OFF,FORMAT,BINARY" )
         self.instr.write( "SEQ ON,{}".format(cnt) )
         self.instr.write( "*TRG" )
@@ -139,4 +139,5 @@ class lecroy:
         self.instr.ask( "*OPC?" )
         self.instr.write( "vbs 'app.SaveRecall.Waveform.TraceTitle=\"{}\"'".format(fileSuffix) )
         self.instr.write( "vbs 'app.SaveRecall.Waveform.SaveFile'" )
+        print("FINISHED SUCCESSFULLY")
 
