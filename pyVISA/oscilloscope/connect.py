@@ -2,11 +2,13 @@ import time
 import oscilloscopes
 
 #inst = keysight( "192.168.0.55" )
-inst = oscilloscopes.lecroy( "192.168.0.171" )
+inst = oscilloscopes.lecroy( "192.168.0.111", timeout=1 ) #timeout in seconds
 
 inst.clearAll()
-inst.setTrigger( chn="EX", slope="POS", lev=0.2, debug=True )
 inst.setTime( hscale=10e-9, hdel=0, debug=True )
+inst.setTriggerLevel( chn="C1", slope="POS", lev=0.0, debug=True )
+inst.setTriggerLevel( chn="C2", slope="NEG", lev=0.0, debug=True )
+inst.setTriggerPattern( src="C1,H,C2,H", con="OR", debug=True )
 inst.setChannel( chn="C1", vscale=0.25, voff=+0.06, debug=True )
 inst.setChannel( chn="C2", vscale=0.25, voff=+0.04, debug=True )
 inst.setChannel( chn="C3", vscale=0.25, voff=+0.02, debug=True )

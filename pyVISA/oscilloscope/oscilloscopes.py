@@ -6,15 +6,16 @@ class keysight:
     
     def clearAll(self):
         print( self.instr.ask('*IDN?') )
+        self.instr.write('STOP')
         self.instr.write("*CLS")
         self.instr.write("*RST")
         self.instr.write(":AUToscale")
 
     def setTrigger( self, chn="CHANnel1", slope="POSitive", lev=0.1, debug=False ): ### units V
-        self.instr.write( ":TRIGger:MODE EDGE" )
-        self.instr.write( ":TRIGger:EDGE:SOURce {}".format(chn) )
         self.instr.write( ":TRIGger:EDGE:LEVel {}".format(lev) )
         self.instr.write( ":TRIGger:EDGE:SLOPe {}".format(slope) )
+        self.instr.write( ":TRIGger:MODE EDGE" )
+        self.instr.write( ":TRIGger:EDGE:SOURce {}".format(chn) )
         if(debug):
             print( "Trigger mode:", self.instr.ask(":TRIGger:MODE?") )
             print( "Trigger source:", self.instr.ask(":TRIGger:EDGE:SOURce?") )
@@ -73,24 +74,39 @@ class keysight:
         f4.write( self.instr.read_raw() )
 
 class lecroy:
-    def __init__(self, address):
+    def __init__(self, address, timeout=5):
         self.instr = vxi11.Instrument( address )
+        self.instr._timeout = timeout
+        self.instr._timeout_ms = timeout*1000
     
     def clearAll(self):
-        print( self.instr.ask('*IDN?') )
+        self.instr.write("STOP")
+        self.instr.write("*CLS")
         self.instr.write("*RST")
+        print("START")
+        print( self.instr.ask('*IDN?') )
         #self.instr.write("COMM_HEADER OFF")
         #self.instr.write("DISPLAY OFF")
 
-    def setTrigger( self, chn="C1", slope="POS", lev=0.1, debug=False ): ### units V
-        self.instr.write( "TRIG_SELECT Edge,SR,{}".format(chn) )
-        self.instr.write( "TRIG_MODE NORM" )
+    def setTriggerLevel( self, chn="C1", slope="POS", lev=0.1, debug=False ): ### units V
         self.instr.write( "{}:TRIG_LEVEL {}".format(chn,lev) )
         self.instr.write( "{}:TRIG_SLOPE {}".format(chn,slope) )
         if(debug):
-            print( "Trigger mode:", self.instr.ask("TRIG_MODE?") )
             print( "Trigger level:", self.instr.ask("{}:TRIG_LEVEL?".format(chn)) )
             print( "Trigger slope:", self.instr.ask("{}:TRIG_SLOPE?".format(chn)) )
+    
+    def setTriggerEdge( self, src="C1", debug=False ): ### units V
+        self.instr.write( "TRIG_SELECT Edge,SR,{}".format(src) )
+        self.instr.write( "TRIG_MODE NORM" )
+        if(debug):
+            print( "Trigger mode:", self.instr.ask("TRIG_MODE?") )
+    
+    def setTriggerPattern( self, src="C1,H,C2,H", con="OR", debug=False ): ### units V
+        self.instr.write( "TRIG_SELECT PA" )
+        self.instr.write( "TRIG_MODE NORM" )
+        self.instr.write( "TRIG_PATTERN {},STATE,{}".format(src,con) )
+        if(debug):
+            print( "Trigger mode:", self.instr.ask("TRIG_MODE?") )
     
     def setChannel( self, chn="C1", vscale=50e-3, voff=0.0, debug=False ): ### units V
         self.instr.write( "{}:COUPLING D50".format(chn) )
@@ -112,6 +128,7 @@ class lecroy:
         self.instr.write( "SEQ ON,{}".format(cnt) )
         self.instr.write( "*TRG" )
         self.instr.write( "WAIT" )
+        self.instr.ask( "*OPC?" )
         self.instr.write( "vbs 'app.SaveRecall.Waveform.TraceTitle=\"{}\"'".format(fileSuffix) )
         self.instr.write( "vbs 'app.SaveRecall.Waveform.SaveFile'" )
 
