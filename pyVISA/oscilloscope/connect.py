@@ -1,8 +1,23 @@
 import oscilloscopes
 
+def GetNextIndex():
+    run_num_file = "./runningIndex.txt"
+    FileHandle = open(run_num_file)
+    nextNumber = int(FileHandle.read().strip())
+    FileHandle.close()
+    FileHandle = open(run_num_file,"w")
+    FileHandle.write(str(nextNumber+1)+"\n") 
+    FileHandle.close()
+    return nextNumber
+
+
 _EVENTS = 1
 _IP = "192.168.0.169"
-_FILESUFFIX = "AutoCosmics_340V_1"
+_FILESUFFIX = "AutoCosmics_340V_{}".format( GetNextIndex() )
+
+print(_FILESUFFIX)
+exit()
+
 
 #inst = keysight( "192.168.0.55" )
 inst = oscilloscopes.lecroy( _IP, timeout=_EVENTS*2*60 ) #timeout in seconds
