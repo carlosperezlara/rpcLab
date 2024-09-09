@@ -1,2 +1,3 @@
 
-pyVISA/oscilloscope/__pycache__/oscilloscopes.cpython-312.pyc
+pyVISA/oscilloscope/__pycache__
+pyVISA/oscilloscope/runningIndex.txt

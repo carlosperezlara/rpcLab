@@ -80,9 +80,10 @@ class lecroy:
         self.instr._timeout_ms = timeout*1000
     
     def clearAll(self):
-        self.instr.write("STOP")
         self.instr.write("*CLS")
         self.instr.write("*RST")
+        self.instr.write("ALST?")
+        self.instr.write("STOP")
         print( self.instr.ask('*IDN?') )
         self.instr.write("GRID SINGLE")
         self.instr.write("DISPLAY ON")
@@ -96,20 +97,20 @@ class lecroy:
     
     def setTriggerEdge( self, src="C1", debug=False ): ### units V
         self.instr.write( "TRIG_SELECT Edge,SR,{}".format(src) )
-        self.instr.write( "TRIG_MODE NORM" )
+        self.instr.write( "TRIG_MODE SINGLE" )
         if(debug):
             print( "Trigger mode:", self.instr.ask("TRIG_MODE?") )
     
     def setTriggerPattern( self, src="C1,H,C2,H", con="OR", debug=False ): ### units V
         self.instr.write( "TRIG_SELECT PA" )
-        self.instr.write( "TRIG_MODE NORM" )
+        self.instr.write( "TRIG_MODE SINGLE" )
         self.instr.write( "TRIG_PATTERN {},STATE,{}".format(src,con) )
         if(debug):
             print( "Trigger mode:", self.instr.ask("TRIG_MODE?") )
     
     def setTriggerMultiStage( self,  debug=False ): ### units V
         self.instr.write( "TRIG_SELECT TEQ,SR,C1,QL,C2,HT,TL,HV,10e-9S" )
-        self.instr.write( "TRIG_MODE NORM" )
+        self.instr.write( "TRIG_MODE SINGLE" )
         if(debug):
             print( "Trigger mode:", self.instr.ask("TRIG_MODE?") )
     
@@ -133,11 +134,15 @@ class lecroy:
         print("START ACQUISITION FOR RUN {} => {} events".format(fileSuffix,cnt))
         self.instr.write("DISPLAY OFF")
         self.instr.write( "STORE_SETUP ALL_DISPLAYED,HDD,AUTO,OFF,FORMAT,BINARY" )
-        self.instr.write( "SEQ ON,{}".format(cnt) )
+        self.instr.write( "SEQ ON, {}".format(cnt) )
+        self.instr.write( "WAIT" )
+        self.instr.ask( "*OPC?" )
         self.instr.write( "*TRG" )
         self.instr.write( "WAIT" )
         self.instr.ask( "*OPC?" )
         self.instr.write( "vbs 'app.SaveRecall.Waveform.TraceTitle=\"{}\"'".format(fileSuffix) )
         self.instr.write( "vbs 'app.SaveRecall.Waveform.SaveFile'" )
+        self.instr.write( "WAIT" )
+        self.instr.ask( "*OPC?" )
         print("FINISHED SUCCESSFULLY")
 

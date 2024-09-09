@@ -11,15 +11,12 @@ def GetNextIndex():
     return nextNumber
 
 
-_EVENTS = 1
+_EVENTS = 200
 _IP = "192.168.0.169"
 _FILESUFFIX = "AutoCosmics_340V_{}".format( GetNextIndex() )
 
-print(_FILESUFFIX)
-exit()
 
-
-#inst = keysight( "192.168.0.55" )
+#inst = keysight( _IP )
 inst = oscilloscopes.lecroy( _IP, timeout=_EVENTS*2*60 ) #timeout in seconds
 
 inst.clearAll()
