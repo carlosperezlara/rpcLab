@@ -76,14 +76,19 @@ class keysight:
 class lecroy:
     def __init__(self, address, timeout=5):
         self.instr = vxi11.Instrument( address )
-        self.instr._timeout = timeout
-        self.instr._timeout_ms = timeout*1000
-    
+        self.instr.timeout = timeout
+   
+    def __del__(self):
+        self.instr.write("vbs 'app.settodefaultsetup'")
+        self.instr.close()
+ 
     def clearAll(self):
+        self.instr.clear()
         self.instr.write("*CLS")
         self.instr.write("*RST")
         self.instr.write("ALST?")
-        self.instr.write("STOP")
+        self.instr.write("vbs 'app.settodefaultsetup'")
+        self.instr.write( "TRIG_MODE STOP" )
         print( self.instr.ask('*IDN?') )
         self.instr.write("GRID SINGLE")
         self.instr.write("DISPLAY ON")
@@ -103,14 +108,12 @@ class lecroy:
     
     def setTriggerPattern( self, src="C1,H,C2,H", con="OR", debug=False ): ### units V
         self.instr.write( "TRIG_SELECT PA" )
-        self.instr.write( "TRIG_MODE SINGLE" )
         self.instr.write( "TRIG_PATTERN {},STATE,{}".format(src,con) )
         if(debug):
             print( "Trigger mode:", self.instr.ask("TRIG_MODE?") )
     
     def setTriggerMultiStage( self,  debug=False ): ### units V
         self.instr.write( "TRIG_SELECT TEQ,SR,C1,QL,C2,HT,TL,HV,10e-9S" )
-        self.instr.write( "TRIG_MODE SINGLE" )
         if(debug):
             print( "Trigger mode:", self.instr.ask("TRIG_MODE?") )
     
@@ -132,14 +135,17 @@ class lecroy:
 
     def acquire( self, cnt=1000, fileSuffix="tmp" ):
         print("START ACQUISITION FOR RUN {} => {} events".format(fileSuffix,cnt))
-        self.instr.write("DISPLAY OFF")
+        self.instr.write( "TRIG_MODE STOP" )
+        self.instr.write( "DISPLAY OFF" )
         self.instr.write( "STORE_SETUP ALL_DISPLAYED,HDD,AUTO,OFF,FORMAT,BINARY" )
         self.instr.write( "SEQ ON, {}".format(cnt) )
         self.instr.write( "WAIT" )
         self.instr.ask( "*OPC?" )
-        self.instr.write( "*TRG" )
+        self.instr.write( "TRIG_MODE SINGLE" )
+        self.instr.write( "ARM" )
         self.instr.write( "WAIT" )
         self.instr.ask( "*OPC?" )
+        self.instr.write( "TRIG_MODE STOP" )
         self.instr.write( "vbs 'app.SaveRecall.Waveform.TraceTitle=\"{}\"'".format(fileSuffix) )
         self.instr.write( "vbs 'app.SaveRecall.Waveform.SaveFile'" )
         self.instr.write( "WAIT" )
